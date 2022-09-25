@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 
 class MyService: Service() {
 
-    val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate() {
         super.onCreate()
