@@ -1,9 +1,6 @@
 package ru.sumin.servicestest
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -12,13 +9,12 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
 
-class MyForegroundService: Service() {
-
-    private val scope = CoroutineScope(Dispatchers.Main)
+class MyIntentService: IntentService(NAME) {
 
     override fun onCreate() {
         super.onCreate()
         log("onCreate")
+        setIntentRedelivery(true)
 
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, createNotification())
@@ -45,26 +41,18 @@ class MyForegroundService: Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        log("onStartCommand")
-        scope.launch {
-            for (i in 0 .. 100) {
-                delay(300)
-                log("Timer: $i")
-            }
-            stopSelf() // or stopService(MyForegroundService.newIntent(this)) from outside
+    override fun onHandleIntent(p0: Intent?) {
+        log("onHandleIntent")
+        for (i in 0 .. 5) {
+            Thread.sleep(300)
+            log("Timer: $i")
         }
-        return START_STICKY
+        stopSelf() // or stopService(MyForegroundService.newIntent(this)) from outside
     }
 
     override fun onDestroy() {
         log("onDestroy")
-        scope.cancel()
         super.onDestroy()
-    }
-
-    override fun onBind(p0: Intent?): IBinder? {
-        TODO("Not yet implemented")
     }
 
     private fun log(message: String) {
@@ -72,9 +60,10 @@ class MyForegroundService: Service() {
     }
 
     companion object {
+        private const val NAME = "MyIntentService"
         private const val NOTIFICATION_ID = 12
         private const val CHANNEL_ID = "channel_id"
         private const val CHANNEL_NAME = "Foreground"
-        fun newIntent(context: Context) = Intent(context, MyForegroundService::class.java)
+        fun newIntent(context: Context) = Intent(context, MyIntentService::class.java)
     }
 }
