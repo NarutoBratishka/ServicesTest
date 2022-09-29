@@ -48,10 +48,11 @@ class MyForegroundService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         log("onStartCommand")
         scope.launch {
-            for (i in 0 .. 100) {
+            for (i in 0 .. 3) {
                 delay(300)
                 log("Timer: $i")
             }
+            stopSelf() // or stopService(MyForegroundService.newIntent(this)) from outside
         }
         return START_STICKY
     }
