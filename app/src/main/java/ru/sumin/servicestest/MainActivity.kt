@@ -1,5 +1,7 @@
 package ru.sumin.servicestest
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
@@ -10,9 +12,11 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import ru.sumin.servicestest.databinding.ActivityMainBinding
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -81,6 +85,18 @@ class MainActivity : AppCompatActivity() {
                 MyWorker.WORK_NAME,
                 ExistingWorkPolicy.APPEND,
                 MyWorker.makeRequest(page++)
+            )
+        }
+        binding.alarmManager.setOnClickListener {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.SECOND, 30)
+            val intent = AlarmReceiver.newIntent(this)
+            val pendingIntent = PendingIntent.getBroadcast(this, 100, intent, 0)
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
             )
         }
     }
